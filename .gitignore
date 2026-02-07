@@ -1,0 +1,138 @@
+# ============================
+# Python
+# ============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ============================
+# Virtual Environments
+# ============================
+venv/
+.env/
+.env.*
+.venv/
+pip-wheel-metadata/
+
+# ============================
+# Jupyter / IPython
+# ============================
+.ipynb_checkpoints/
+.profile_default/
+ipython_config.py
+
+# ============================
+# Streamlit
+# ============================
+.streamlit/secrets.toml
+.streamlit/config.toml
+
+# ============================
+# Environment & Secrets
+# ============================
+*.env
+*.key
+*.pem
+*.crt
+
+# ============================
+# OS / Editor noise
+# ============================
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ============================
+# Logs
+# ============================
+*.log
+logs/
+*.out
+
+# ============================
+# ML / AI artifacts (optional)
+# ============================
+models/
+checkpoints/
+wandb/
+mlruns/
+
+# ============================
+# Vector DB / Data (IMPORTANT)
+# ============================
+# Ignore ALL data folders by default
+data/
+
+# EXCEPT: allow ReguLens Chroma DB (needed for deployment)
+!regulens/data/
+!regulens/data/chroma/
+!regulens/data/chroma/**
+
+# ============================
+# Temporary / Scratch
+# ============================
+tmp/
+temp/
+.cache/
+
+# ============================
+# Node / Frontend (if added later)
+# ============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================
+# Python
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ========================
+# Virtual Environments
+# ========================
+venv/
+.venv/
+*/venv/
+*/.venv/
+
+# ========================
+# Environment files
+# ========================
+.env
+*.env
+
+# ========================
+# Vector Databases / RAG
+# ========================
+data/
+*/data/
+*/data/chroma/
+*.sqlite3
+
+# ========================
+# ML / Torch / HF
+# ========================
+*.pt
+*.bin
+*.onnx
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
