@@ -1,4 +1,5 @@
-from langchain_chroma import Chroma
+from langchain_community.vectorstores import Chroma
+
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 from config import CHROMA_DIR, EMBEDDING_MODEL
