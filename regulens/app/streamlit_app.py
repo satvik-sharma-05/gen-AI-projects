@@ -3,15 +3,9 @@ from pathlib import Path
 import streamlit as st
 import json
 
-# --------------------------------------------------
-# Fix Python path FIRST (critical for Streamlit Cloud)
-# --------------------------------------------------
-
-ROOT_DIR = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT_DIR))
 
 # Now imports will work
-from app.rag.generator import generate_answer
+from regulens.rag.generator import generate_answer
 
 # --------------------------------------------------
 # Environment
