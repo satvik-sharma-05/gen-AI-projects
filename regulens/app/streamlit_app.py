@@ -1,11 +1,17 @@
 import sys
 from pathlib import Path
+
+# --------------------------------------------------
+# Ensure repo root is on Python path (monorepo fix)
+# --------------------------------------------------
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT))
+
 import streamlit as st
-import json
+from dotenv import load_dotenv
 
-
-# Now imports will work
 from regulens.app.rag.generator import generate_answer
+
 
 # --------------------------------------------------
 # Environment
