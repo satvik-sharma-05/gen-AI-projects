@@ -1,0 +1,14 @@
+# Virtual environment
+venv/
+.venv/
+
+# Vector DB
+data/
+ReguLens/data/
+ReguLens/data/chroma/
+ReguLens/data/chroma/**
+
+# Torch / binaries safety
+*.dll
+*.pyd
+*.so
