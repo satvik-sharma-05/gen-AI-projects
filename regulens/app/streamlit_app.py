@@ -5,7 +5,7 @@ import json
 
 
 # Now imports will work
-from regulens.rag.generator import generate_answer
+from regulens.app.rag.generator import generate_answer
 
 # --------------------------------------------------
 # Environment
