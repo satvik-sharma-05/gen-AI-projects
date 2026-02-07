@@ -1,7 +1,6 @@
 import sys
 from pathlib import Path
 import streamlit as st
-from dotenv import load_dotenv
 import json
 
 # --------------------------------------------------
@@ -18,7 +17,6 @@ from app.rag.generator import generate_answer
 # Environment
 # --------------------------------------------------
 
-load_dotenv()
 
 st.set_page_config(
     page_title="ReguLens – PRA COREP Assistant",
