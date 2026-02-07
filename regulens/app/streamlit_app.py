@@ -1,14 +1,23 @@
 import sys
-from pyparsing import Path
+from pathlib import Path
 import streamlit as st
 from dotenv import load_dotenv
 import json
-import os
-# IMPORTANT: absolute import from app package
-from ReguLens.app.rag.generator import generate_answer
+
+# --------------------------------------------------
+# Fix Python path FIRST (critical for Streamlit Cloud)
+# --------------------------------------------------
+
 ROOT_DIR = Path(__file__).resolve().parents[2]
-sys.path.append(str(ROOT_DIR))
-# Load env vars (locally). On Streamlit Cloud, secrets are used instead.
+sys.path.insert(0, str(ROOT_DIR))
+
+# Now imports will work
+from app.rag.generator import generate_answer
+
+# --------------------------------------------------
+# Environment
+# --------------------------------------------------
+
 load_dotenv()
 
 st.set_page_config(
@@ -16,22 +25,23 @@ st.set_page_config(
     layout="centered"
 )
 
-st.title("🏦 ReguLens")
+st.title("ReguLens")
 st.subheader("LLM-assisted PRA COREP Reporting Assistant (Prototype)")
 
 st.markdown("""
 This tool helps answer **PRA COREP reporting questions** using official regulatory documents.
 
-### ✅ Supported templates
+### Supported templates
 - **C 01.00** – Own Funds  
 - **C 14.00** – Securitisation  
 
 Any other COREP template will be marked **out of scope**.
 """)
 
-# -------------------------
+# --------------------------------------------------
 # User input
-# -------------------------
+# --------------------------------------------------
+
 query = st.text_input(
     "Ask a COREP question",
     placeholder="e.g. What does C 14.00 report?"
@@ -46,32 +56,24 @@ if st.button("Ask"):
 
         st.success("Answer generated")
 
-        # -------------------------
-        # Main answer
-        # -------------------------
-        st.markdown("## 📌 Answer")
+        # Answer
+        st.markdown("## Answer")
         st.write(result.get("answer", ""))
 
-        # -------------------------
         # Template
-        # -------------------------
-        st.markdown("## 📄 COREP Template")
+        st.markdown("## COREP Template")
         st.code(result.get("template", ""))
 
-        # -------------------------
         # COREP fields
-        # -------------------------
         corep_fields = result.get("corep_fields", {})
         if corep_fields:
-            st.markdown("## 🧾 COREP Fields (Structured Output)")
+            st.markdown("## Structured COREP Fields")
             st.json(corep_fields)
 
-        # -------------------------
-        # Regulatory references (audit trail)
-        # -------------------------
+        # Audit trail
         references = result.get("references", [])
         if references:
-            st.markdown("## 🔍 Regulatory References (Audit Trail)")
+            st.markdown("## Regulatory References (Audit Trail)")
             for ref in references:
                 st.markdown(
                     f"- **Template:** {ref.get('template')}  \n"
@@ -79,8 +81,6 @@ if st.button("Ask"):
                     f"  **Description:** {ref.get('description')}"
                 )
 
-        # -------------------------
-        # Raw JSON (for assessors)
-        # -------------------------
-        with st.expander("🧠 Raw Structured Output (JSON)"):
+        # Raw JSON
+        with st.expander("Raw structured output (JSON)"):
             st.json(result)
