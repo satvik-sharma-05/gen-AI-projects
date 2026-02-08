@@ -12,7 +12,7 @@ import {
   FiTrash2,
   FiRefreshCw,
   FiCalendar,
-  FiBuilding,
+  FiHome,
   FiHelpCircle
 } from 'react-icons/fi';
 import './QueryForm.css'; // Optional CSS file for custom styles
@@ -423,7 +423,7 @@ const QueryForm = ({ onResult, onError, systemStatus, apiBase }) => {
               <Col md={6}>
                 <Form.Group>
                   <Form.Label className="fw-bold d-flex align-items-center">
-                    <FiBuilding className="me-2" />
+                    <FiHome className="me-2" />
                     Institution Name
                   </Form.Label>
                   <Form.Control
