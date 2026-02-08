@@ -75,9 +75,9 @@ mlruns/
 data/
 
 # EXCEPT: allow ReguLens Chroma DB (needed for deployment)
-!regulens/data/
-!regulens/data/chroma/
-!regulens/data/chroma/**
+!rag-bank/app/data/
+!rag-bank/app/data/chroma/
+!rag-bank/app/data/chroma/**
 
 # ============================
 # Temporary / Scratch

@@ -1,0 +1,23 @@
+[
+  {
+    "timestamp": "2026-02-08T02:22:47.364980",
+    "user_query": {
+      "question": "How should we report Common Equity Tier 1 capital for instruments that qualify as common equity?",
+      "scenario_description": "Our bank has issued ordinary shares and retained earnings that meet CET1 criteria under CRR Article 25.",
+      "template": "C 01.00",
+      "institution_name": "UK Banking Corporation",
+      "reporting_date": "2026-02-07"
+    },
+    "retrieved_docs_count": 3,
+    "response_fields_count": 3,
+    "validation_results": [
+      "Response creation error: 1 validation error for COREPResponse\nreporting_date\n  Input should be a valid string [type=string_ty"
+    ]
+  },
+  {
+    "timestamp": "2026-02-08T02:25:16.121512",
+    "user_query": {
+      "question": "How should we report Common Equity Tier 1 capital for instruments that qualify as common equity?",
+      "scenario_description": "Our bank has issued ordinary shares and retained earnings that meet CET1 criteria under CRR Article 25.",
+      "template": "C 01.00",
+      "reporting_date": 
