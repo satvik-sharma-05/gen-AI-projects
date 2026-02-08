@@ -10,7 +10,7 @@ const QueryForm = ({ onResult, onError, systemStatus, apiBase }) => {
     reporting_date: new Date().toISOString().split('T')[0]
   });
   const [loading, setLoading] = useState(false);
-
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -57,7 +57,7 @@ const QueryForm = ({ onResult, onError, systemStatus, apiBase }) => {
     }
     
     try {
-      const response = await fetch(`${apiBase}/query`, {
+      const response = await fetch(`${API_BASE}/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
