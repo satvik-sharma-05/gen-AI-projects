@@ -276,7 +276,13 @@ async def initialize_vectorstore(request: InitializeRequest):
     
     try:
         # Check if data directory exists
-        data_dir = "./data/raw"
+        from pathlib import Path
+
+        BASE_DIR = Path(__file__).resolve().parent  # rag-bank/app
+        DATA_DIR = BASE_DIR / "data" / "raw"
+
+        data_dir = str(DATA_DIR)
+
         if not os.path.exists(data_dir):
             return {
                 "status": "error",
