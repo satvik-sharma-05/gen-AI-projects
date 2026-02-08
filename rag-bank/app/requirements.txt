@@ -1,16 +1,25 @@
-﻿fastapi==0.104.1
-uvicorn[standard]==0.24.0
-langchain==0.1.0
-langchain-groq==0.3.8
-chromadb==0.4.15
-pydantic==2.5.0
-pypdf==3.17.4
-python-dotenv==1.0.0
-openpyxl==3.1.2
-pandas==2.1.4
-pydantic-settings==2.1.0
-python-multipart==0.0.6
-sentence-transformers
-huggingface-hub
-requests
-langchain_groq
+﻿# Core
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+
+# LangChain family - compatible versions (late 2025/early 2026)
+langchain==0.3.3
+langchain-core==0.3.8
+langchain-community==0.3.2
+langchain-text-splitters==0.3.0
+langchain-groq==0.2.0
+langchain-chroma==0.1.4
+
+# Vector DB & embeddings
+chromadb==0.5.11
+sentence-transformers==3.2.2
+
+# PDF & data
+pdfplumber==0.11.4
+pymupdf==1.25.1
+pandas==2.2.2
+openpyxl==3.1.5
+
+# Utils
+python-dotenv==1.0.1
+tabulate==0.9.0

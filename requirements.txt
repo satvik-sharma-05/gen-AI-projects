@@ -1,8 +1,8 @@
-# Core web framework
+# Core
 fastapi==0.115.0
 uvicorn[standard]==0.32.0
 
-# LangChain ecosystem (use recent compatible versions)
+# LangChain family - compatible versions (late 2025/early 2026)
 langchain==0.3.3
 langchain-core==0.3.8
 langchain-community==0.3.2
@@ -10,16 +10,16 @@ langchain-text-splitters==0.3.0
 langchain-groq==0.2.0
 langchain-chroma==0.1.4
 
-# Vector store & embeddings
+# Vector DB & embeddings
 chromadb==0.5.11
 sentence-transformers==3.2.2
 
-# PDF processing
+# PDF & data
 pdfplumber==0.11.4
 pymupdf==1.25.1
-
-# Utilities
-python-dotenv==1.0.1
 pandas==2.2.2
 openpyxl==3.1.5
+
+# Utils
+python-dotenv==1.0.1
 tabulate==0.9.0
