@@ -45,6 +45,8 @@ const App = () => {
   const [queryResult, setQueryResult] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  println("API_BASE:", API_BASE);
+  console.log("VITE:", import.meta.env.VITE_API_URL);
 
 
 
