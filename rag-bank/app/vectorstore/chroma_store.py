@@ -12,12 +12,29 @@ class ChromaVectorStore:
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
 
+        from uuid import uuid4
+
     def create_store(self, documents):
-        return Chroma.from_documents(
-            documents=documents,
+        texts = []
+        metadatas = []
+        ids = []
+
+        for doc in documents:
+            if not doc.page_content or not doc.page_content.strip():
+                continue
+
+            texts.append(doc.page_content)
+            metadatas.append(doc.metadata or {})
+            ids.append(str(uuid4()))
+
+        return Chroma.from_texts(
+            texts=texts,
+            metadatas=metadatas,
+            ids=ids,
             embedding=self.embeddings,
             persist_directory=self.persist_directory
         )
+
 
     def load_store(self):
         return Chroma(
