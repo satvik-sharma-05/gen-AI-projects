@@ -1,7 +1,7 @@
 // C:\satvik\legal\gen-AI-projects\rag-bank\frontend\src\components\ResultsDisplay.jsx
 import React, { useState } from 'react';
 import { Card, Table, Badge, Alert, Row, Col, Button, ProgressBar } from 'react-bootstrap';
-import ReactJson from 'react-json-view';
+import ReactJson from '@uiw/react-json-view';
 import { toast } from 'react-toastify';
 
 const ResultsDisplay = ({ results, onClose }) => {
