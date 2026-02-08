@@ -270,61 +270,94 @@ async def get_templates():
     return {"templates": settings.allowed_templates}
 
 @app.post("/initialize")
+@app.post("/initialize")
 async def initialize_vectorstore(request: InitializeRequest):
-    """Initialize the vector store with documents"""
+    """Initialize the vector store with documents from rag-bank/data/raw"""
     global vector_store_manager, retriever, is_initialized
     
     try:
-        # Check if data directory exists
         from pathlib import Path
-
-        BASE_DIR = Path(__file__).resolve().parent  # rag-bank/app
-        DATA_DIR = BASE_DIR / "data" / "raw"
-
+        
+        # ────────────────────────────────────────────────
+        # Calculate correct path: go UP from app/ → to rag-bank/
+        # Then enter data/raw
+        # ────────────────────────────────────────────────
+        APP_DIR = Path(__file__).resolve().parent                  # → .../rag-bank/app
+        PROJECT_ROOT = APP_DIR.parent                              # → .../rag-bank
+        DATA_DIR = PROJECT_ROOT / "data" / "raw"
         data_dir = str(DATA_DIR)
-
+        
+        print("=" * 60)
+        print("INITIALIZE ENDPOINT CALLED")
+        print(f"Current working dir:     {os.getcwd()}")
+        print(f"__file__ resolved parent: {APP_DIR}")
+        print(f"Looking for PDFs in:      {data_dir}")
+        print("=" * 60)
+        
+        # Check if directory exists
         if not os.path.exists(data_dir):
             return {
                 "status": "error",
                 "message": f"Data directory not found: {data_dir}",
-                "note": "Create the directory and add your PDF documents"
+                "expected_location": "rag-bank/data/raw (relative to Root Directory on Render)",
+                "note": (
+                    "Make sure:\n"
+                    "1. You have a 'data/raw' folder inside the 'rag-bank' directory\n"
+                    "2. It contains at least one .pdf file\n"
+                    "3. The folder and files are committed & pushed to GitHub\n"
+                )
             }
         
-        # List files
-        files = os.listdir(data_dir)
-        print(f"📁 Found {len(files)} files in data/raw:")
-        for file in files:
+        # List PDF files only (more robust than os.listdir + manual filter)
+        pdf_files = [f for f in os.listdir(data_dir) if f.lower().endswith(('.pdf', '.PDF'))]
+        
+        if not pdf_files:
+            return {
+                "status": "error",
+                "message": "No PDF files found in the data/raw directory",
+                "path_checked": data_dir,
+                "found_files": os.listdir(data_dir),
+                "note": "Add one or more .pdf files to rag-bank/data/raw and redeploy"
+            }
+        
+        print(f"📁 Found {len(pdf_files)} PDF files:")
+        for file in pdf_files:
             print(f"   - {file}")
         
-        # Load documents
+        # ────────────────────────────────────────────────
+        # Proceed with loading
+        # ────────────────────────────────────────────────
         loader = DocumentLoader(data_dir)
         documents = loader.load_pdfs()
         
         if not documents:
             return {
                 "status": "error",
-                "message": "No PDF documents found in data/raw directory",
-                "note": "Add your regulatory PDF documents to the data/raw folder"
+                "message": "Failed to load any document pages (even though files were found)",
+                "path": data_dir,
+                "pdf_count": len(pdf_files),
+                "note": "Check the logs above for loader errors (PyPDFLoader / UnstructuredPDFLoader)"
             }
         
-        print(f"📄 Loaded {len(documents)} document pages")
+        print(f"📄 Successfully loaded {len(documents)} document pages")
         
         # Chunk documents
         chunker = DocumentChunker()
         chunked_docs = chunker.chunk_documents(documents)
         print(f"✂️ Created {len(chunked_docs)} chunks")
         
-        # Create vector store
+        # Create / update vector store
         if not vector_store_manager:
-            vector_store_manager = ChromaVectorStore(settings.chroma_persist_dir)
             if ChromaVectorStore is None:
                 return {
-                "status": "error",
-                "message": "ChromaVectorStore not available (import failed at startup)"
+                    "status": "error",
+                    "message": "ChromaVectorStore class is not available (import failed earlier)"
                 }
-
-        print(f"🗄️ Creating vector store...")
+            vector_store_manager = ChromaVectorStore(settings.chroma_persist_dir)
+        
+        print(f"🗄️ Creating / updating vector store at: {settings.chroma_persist_dir}")
         vectorstore = vector_store_manager.create_store(chunked_docs)
+        
         retriever = RegulatoryRetriever(vectorstore)
         is_initialized = True
         
@@ -333,16 +366,18 @@ async def initialize_vectorstore(request: InitializeRequest):
             "message": f"Vector store initialized with {len(chunked_docs)} chunks from {len(documents)} pages",
             "documents_loaded": len(documents),
             "chunks_created": len(chunked_docs),
-            "files_processed": len(files)
+            "pdf_files_found": len(pdf_files),
+            "persist_directory": settings.chroma_persist_dir
         }
         
     except Exception as e:
-        print(f"❌ Initialization error: {e}")
+        print(f"❌ CRITICAL ERROR during initialization:")
         import traceback
         traceback.print_exc()
         return {
             "status": "error",
-            "message": f"Initialization failed: {str(e)}"
+            "message": f"Initialization failed: {str(e)}",
+            "note": "Check Render logs for full traceback"
         }
     
 @app.get("/debug/imports")
