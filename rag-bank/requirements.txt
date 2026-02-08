@@ -27,3 +27,4 @@ unstructured==0.16.0
 requests==2.32.5
 tqdm==4.67.3
 typing-extensions==4.15.0
+langchain-huggingface==0.1.2
