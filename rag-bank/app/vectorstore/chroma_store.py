@@ -1,4 +1,6 @@
 import os
+from uuid import uuid4
+
 from langchain_chroma import Chroma
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 
@@ -8,11 +10,9 @@ class ChromaVectorStore:
         self.persist_directory = persist_directory
 
         self.embeddings = HuggingFaceInferenceAPIEmbeddings(
-            api_key=os.environ["HF_API_KEY"],
+            api_key=os.environ.get("HF_API_KEY"),
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
-
-        from uuid import uuid4
 
     def create_store(self, documents):
         texts = []
@@ -34,7 +34,6 @@ class ChromaVectorStore:
             embedding=self.embeddings,
             persist_directory=self.persist_directory
         )
-
 
     def load_store(self):
         return Chroma(
