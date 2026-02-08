@@ -1,6 +1,6 @@
 import os
 from langchain_chroma import Chroma
-from langchain_community.embeddings import HuggingFaceEndpointEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 
 class ChromaVectorStore:
