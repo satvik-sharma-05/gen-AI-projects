@@ -114,10 +114,7 @@ venv/
 # ========================
 # Vector Databases / RAG
 # ========================
-data/
-*/data/
-*/data/chroma/
-*.sqlite3
+
 
 # ========================
 # ML / Torch / HF
