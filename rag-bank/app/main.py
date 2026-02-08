@@ -366,8 +366,19 @@ async def initialize_vectorstore(request: InitializeRequest):
         
         # Chunk documents
         chunker = DocumentChunker()
-        chunked_docs = chunker.chunk_documents(documents)
-        print(f"✂️ Created {len(chunked_docs)} chunks")
+        raw_chunks = chunker.chunk_documents(documents)
+
+        # 🔥 CRITICAL FIX: remove empty / invalid chunks
+        chunked_docs = [
+            doc for doc in raw_chunks
+            if hasattr(doc, "page_content")
+            and doc.page_content
+            and doc.page_content.strip()
+        ]
+
+        print(f"✂️ Created {len(raw_chunks)} chunks")
+        print(f"✅ Filtered valid chunks: {len(chunked_docs)}")
+
         
         # Create / update vector store
         if not vector_store_manager:
