@@ -487,15 +487,15 @@ async def process_query(user_query: UserQuery, background_tasks: BackgroundTasks
         raise HTTPException(status_code=500, detail=f"Error processing query: {str(e)}")
 
 
-if __name__ == "__main__":
-    print("\nStarting Uvicorn...")
-    print("Recommended command: python -m main   (better for relative imports)")
-    print("Or: python main.py\n")
+# if __name__ == "__main__":
+#     print("\nStarting Uvicorn...")
+#     print("Recommended command: python -m main   (better for relative imports)")
+#     print("Or: python main.py\n")
     
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )
+#     uvicorn.run(
+#         "main:app",
+#         host="0.0.0.0",
+#         port=8000,
+#         reload=True,
+#         log_level="info"
+#     )
