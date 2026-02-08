@@ -44,6 +44,9 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('query');
   const [queryResult, setQueryResult] = useState(null);
   const [showResults, setShowResults] = useState(false);
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+
 
   useEffect(() => {
     checkHealth();
@@ -79,7 +82,7 @@ const App = () => {
 
   const checkHealth = async () => {
     try {
-      const response = await fetch('http://localhost:8000/health');
+      const response = await fetch(`${API_BASE}/health`);
       const data = await response.json();
       setSystemStatus(data);
     } catch (err) {
@@ -89,7 +92,7 @@ const App = () => {
 
   const handleInitialize = async () => {
     try {
-      const response = await fetch('http://localhost:8000/initialize', {
+      const response = await fetch(`${API_BASE}/initialize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ force_recreate: false })
@@ -154,7 +157,7 @@ const App = () => {
             </button>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="http://localhost:8000/docs" target="_blank" rel="noopener noreferrer">
+            <a className="nav-link" href={`${API_BASE}/docs`} target="_blank" rel="noopener noreferrer">
               API Docs
             </a>
           </li>
@@ -261,7 +264,7 @@ const QueryForm = ({ systemStatus, onError, onResponse }) => {
         reporting_date: formData.reporting_date
       };
 
-      const response = await fetch('http://localhost:8000/query', {
+      const response = await fetch(`${API_BASE}/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
