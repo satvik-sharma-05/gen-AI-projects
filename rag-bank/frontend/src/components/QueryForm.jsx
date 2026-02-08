@@ -10,7 +10,8 @@ const QueryForm = ({ onResult, onError, systemStatus, apiBase }) => {
     reporting_date: new Date().toISOString().split('T')[0]
   });
   const [loading, setLoading] = useState(false);
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const API_BASE = import.meta.env.VITE_API_URL || apiBase || 'http://localhost:8000';
+  console.log("QueryForm API_BASE:", API_BASE);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
