@@ -1,28 +1,40 @@
 ﻿import os
 import sys
+import traceback
 from contextlib import asynccontextmanager
-
-# ────────────────────────────────────────────────
-# Fix import paths FIRST — before any other imports
-# ────────────────────────────────────────────────
-
-import os
-import sys
 from pathlib import Path
 
-# 🔥 FIX PYTHON PATH
+# ────────────────────────────────────────────────
+# Fix PYTHON PATH first
+# ────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent  # rag-bank/app
 sys.path.insert(0, str(BASE_DIR))
 
 # ────────────────────────────────────────────────
-# Now safe to import everything else
+# Global exception handler for startup crashes
+# ────────────────────────────────────────────────
+def log_uncaught_exception(exc_type, exc_value, exc_traceback):
+    print("!!! UNCAUGHT EXCEPTION IN STARTUP !!!")
+    traceback.print_exception(exc_type, exc_value, exc_traceback, file=sys.stdout)
+    sys.exit(1)
+
+sys.excepthook = log_uncaught_exception
+
+print("=== DEBUG: main.py starting ===")
+print(f"Python version: {sys.version}")
+print(f"sys.path: {sys.path}")
+print(f"Working dir: {os.getcwd()}")
+print("=== END DEBUG ===")
+
+# ────────────────────────────────────────────────
+# FastAPI & core imports
 # ────────────────────────────────────────────────
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 
-# Import config with fallback
+# Config with fallback
 try:
     from config import settings
 except ImportError:
@@ -34,7 +46,7 @@ except ImportError:
             self.allowed_templates = ["C 01.00", "C 14.00"]
     settings = Settings()
 
-# Schemas with fallback
+# Schemas fallback
 try:
     from schemas.corep import UserQuery, COREPResponse, ReportingField
 except ImportError:
@@ -82,7 +94,7 @@ except ImportError as e:
 try:
     from rag.retriever import RegulatoryRetriever
 except ImportError:
-    print("⚠ rag.retriever not found → using dummy retriever")
+    print("⚠ rag.retriever not found → dummy retriever")
     class RegulatoryRetriever:
         def __init__(self, vectorstore): 
             self.vectorstore = vectorstore
@@ -139,49 +151,52 @@ class InitializeRequest(BaseModel):
 async def lifespan(app: FastAPI):
     global vector_store_manager, retriever, generator, is_initialized
     
-    print("\n" + "="*70)
-    print("🚀 ReguLens COREP Assistant - Starting Up")
-    print("="*70)
+    print("=== LIFESPAN START ===")
+    print("Step 1: Checking settings...")
+    print(f"GROQ key present: {bool(settings.groq_api_key)}")
     
-    if not settings.groq_api_key:
-        print("❌ GROQ_API_KEY missing → generation will fail")
-    else:
-        print("✓ GROQ API key detected")
-
-    # Vector store init
-    
+    print("Step 2: Chroma init...")
     if ChromaVectorStore:
         try:
+            print("  Creating ChromaVectorStore...")
             vector_store_manager = ChromaVectorStore(settings.chroma_persist_dir)
+            print("  Chroma instance created successfully")
+            
             if hasattr(vector_store_manager, 'store_exists') and vector_store_manager.store_exists():
+                print("  Existing store found → loading...")
                 if hasattr(vector_store_manager, 'load_store'):
                     vectorstore = vector_store_manager.load_store()
                     retriever = RegulatoryRetriever(vectorstore)
                     is_initialized = True
-                    print("✓ Vector store loaded from disk")
+                    print("  ✓ Vector store loaded from disk")
                 else:
-                    print("ℹ No load_store method found")
+                    print("  ℹ No load_store method found")
             else:
-                print("ℹ Vector store not found → use /initialize")
+                print("  ℹ No existing store → call /initialize")
         except Exception as e:
-            print(f"❌ Vector store init failed: {e}")
+            print(f"  Chroma CRASH: {str(e)}")
+            traceback.print_exc()
+            # Optional: raise if you want hard fail, or continue
     else:
-        print("❌ ChromaVectorStore unavailable")
-
-    # Generator init
+        print("  ChromaVectorStore unavailable (import failed)")
+    
+    print("Step 3: Generator init...")
     if settings.groq_api_key and COREPGenerator:
         try:
+            print("  Creating COREPGenerator...")
             generator = COREPGenerator(settings.groq_api_key)
-            print("✓ COREPGenerator initialized")
+            print("  ✓ COREPGenerator initialized")
         except Exception as e:
-            print(f"❌ Generator init failed: {e}")
+            print(f"  Generator CRASH: {str(e)}")
+            traceback.print_exc()
     else:
-        print("❌ COREPGenerator unavailable or no API key")
-
-    print(f"📊 Allowed templates: {settings.allowed_templates}")
-    print("="*70 + "\n")
+        print("  Generator unavailable or no GROQ key")
+    
+    print(f"Step 4: Allowed templates: {settings.allowed_templates}")
+    print("=== LIFESPAN COMPLETE - startup finished ===")
     
     yield
+    
     print("Shutting down ReguLens...")
 
 # ─── FastAPI App ───────────────────────────────────────
@@ -198,6 +213,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 @app.get("/debug/vectorstore")
 async def debug_vectorstore():
     """Debug endpoint to check vector store status"""
