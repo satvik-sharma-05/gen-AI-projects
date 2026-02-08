@@ -1,17 +1,15 @@
-# rag-bank/app/vectorstore/chroma_store.py
-
 import os
 from langchain_chroma import Chroma
-from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+from langchain_community.embeddings import HuggingFaceEndpointEmbeddings
 
 
 class ChromaVectorStore:
     def __init__(self, persist_directory: str):
         self.persist_directory = persist_directory
 
-        self.embeddings = HuggingFaceInferenceAPIEmbeddings(
-            api_key=os.environ.get("HF_API_KEY"),
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        self.embeddings = HuggingFaceEndpointEmbeddings(
+            huggingfacehub_api_token=os.environ["HF_API_KEY"],
+            model="sentence-transformers/all-MiniLM-L6-v2"
         )
 
     def create_store(self, documents):
