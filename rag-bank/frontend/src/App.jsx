@@ -174,6 +174,7 @@ const App = () => {
                   systemStatus={systemStatus}
                   onError={(msg) => showToast(msg, 'error')}
                   onResponse={handleQueryResponse}
+                  apiBase = {API_BASE}
                 />
               ) : (
                 <div className="results-container">

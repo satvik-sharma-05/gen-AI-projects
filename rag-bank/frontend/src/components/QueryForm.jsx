@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Card, Row, Col, Spinner, Alert } from 'react-bootstrap';
 
-const QueryForm = ({ onResult, onError, systemStatus }) => {
+const QueryForm = ({ onResult, onError, systemStatus, apiBase }) => {
   const [formData, setFormData] = useState({
     question: '',
     scenario_description: '',
@@ -57,7 +57,7 @@ const QueryForm = ({ onResult, onError, systemStatus }) => {
     }
     
     try {
-      const response = await fetch('http://localhost:8000/query', {
+      const response = await fetch(`${apiBase}/query`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
