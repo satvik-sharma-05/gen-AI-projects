@@ -158,6 +158,7 @@ async def lifespan(app: FastAPI):
         print("✓ GROQ API key detected")
 
     # Vector store init
+    
     if ChromaVectorStore:
         try:
             vector_store_manager = ChromaVectorStore(settings.chroma_persist_dir)
@@ -326,7 +327,12 @@ async def initialize_vectorstore(request: InitializeRequest):
         # Create vector store
         if not vector_store_manager:
             vector_store_manager = ChromaVectorStore(settings.chroma_persist_dir)
-        
+            if ChromaVectorStore is None:
+                return {
+                "status": "error",
+                "message": "ChromaVectorStore not available (import failed at startup)"
+                }
+
         print(f"🗄️ Creating vector store...")
         vectorstore = vector_store_manager.create_store(chunked_docs)
         retriever = RegulatoryRetriever(vectorstore)
