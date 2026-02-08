@@ -5,23 +5,7 @@ from contextlib import asynccontextmanager
 # ────────────────────────────────────────────────
 # Fix import paths FIRST — before any other imports
 # ────────────────────────────────────────────────
-script_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = script_dir  # in your case app/ is the root
 
-# Insert root and all known subpackages
-sys.path.insert(0, project_root)
-for subdir in [
-    "vectorstore", "rag", "ingestion", "validation", "audit", "schemas", "config"
-]:
-    full_path = os.path.join(project_root, subdir)
-    if os.path.isdir(full_path):
-        sys.path.insert(0, full_path)
-
-# Optional: print sys.path for debugging (comment out in production)
-print("DEBUG: sys.path after modification:")
-for p in sys.path[:8]:  # show first few only
-    print(f"  → {p}")
-print("...")
 
 # ────────────────────────────────────────────────
 # Now safe to import everything else

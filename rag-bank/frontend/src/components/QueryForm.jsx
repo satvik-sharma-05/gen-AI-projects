@@ -17,7 +17,7 @@ import {
 } from 'react-icons/fi';
 import './QueryForm.css'; // Optional CSS file for custom styles
 
-const QueryForm = ({ onResult, onError, systemStatus, apiBase }) => {
+const QueryForm = ({ onResponse, onError, systemStatus, apiBase }) => {
   const [formData, setFormData] = useState({
     question: '',
     scenario_description: '',
@@ -160,7 +160,7 @@ const QueryForm = ({ onResult, onError, systemStatus, apiBase }) => {
         autoClose: 5000,
       });
 
-      onResult(result);
+      onResponse(result);
 
     } catch (error) {
       // Error toast
@@ -279,19 +279,7 @@ const QueryForm = ({ onResult, onError, systemStatus, apiBase }) => {
 
   return (
     <>
-      <ToastContainer 
-        position="top-right"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-        limit={3}
-      />
+     
 
       <Card className="shadow-lg border-0">
         <Card.Header className="bg-gradient-primary text-white py-3">
