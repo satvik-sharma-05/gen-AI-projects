@@ -1,0 +1,60 @@
+/* QueryForm.css */
+.border-hover {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.border-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+  border-color: #4dabf7;
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Toast customization */
+.Toastify__toast {
+  border-radius: 10px !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.Toastify__toast--success {
+  background: linear-gradient(135deg, #00b09b, #96c93d) !important;
+}
+
+.Toastify__toast--error {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b) !important;
+}
+
+.Toastify__toast--warning {
+  background: linear-gradient(135deg, #f7971e, #ffd200) !important;
+}
+
+.Toastify__toast--info {
+  background: linear-gradient(135deg, #4facfe, #00f2fe) !important;
+}
+
+/* Form input focus effects */
+.form-control:focus {
+  border-color: #4dabf7;
+  box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
+}
+
+/* Badge hover effects */
+.badge-hover:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
