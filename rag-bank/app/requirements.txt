@@ -3,14 +3,13 @@ fastapi==0.115.0
 uvicorn==0.32.0
 python-dotenv==1.0.1
 
-# LangChain (minimal)
+# LangChain (remote-only, SAFE)
 langchain==0.3.6
 langchain-core==0.3.63
 langchain-community==0.3.4
 langchain-text-splitters==0.3.0
 langchain-chroma==0.1.4
 langchain-groq==0.2.0
-langchain-huggingface==0.1.2
 
 # Vector DB
 chromadb==0.5.11
