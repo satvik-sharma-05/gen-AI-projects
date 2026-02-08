@@ -72,12 +72,7 @@ mlruns/
 # Vector DB / Data (IMPORTANT)
 # ============================
 # Ignore ALL data folders by default
-data/
 
-# EXCEPT: allow ReguLens Chroma DB (needed for deployment)
-!rag-bank/app/data/
-!rag-bank/app/data/chroma/
-!rag-bank/app/data/chroma/**
 
 # ============================
 # Temporary / Scratch
