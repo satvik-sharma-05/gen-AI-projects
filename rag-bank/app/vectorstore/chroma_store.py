@@ -1,15 +1,15 @@
 import os
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEndpointEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 
 
 class ChromaVectorStore:
     def __init__(self, persist_directory: str):
         self.persist_directory = persist_directory
 
-        self.embeddings = HuggingFaceEndpointEmbeddings(
-            huggingfacehub_api_token=os.environ["HF_API_KEY"],
-            model="sentence-transformers/all-MiniLM-L6-v2"
+        self.embeddings = HuggingFaceInferenceAPIEmbeddings(
+            api_key=os.environ["HF_API_KEY"],
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
 
     def create_store(self, documents):
