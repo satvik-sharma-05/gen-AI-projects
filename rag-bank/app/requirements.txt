@@ -1,20 +1,20 @@
-﻿# Core FastAPI
+﻿# Core
 fastapi==0.115.0
 uvicorn[standard]==0.32.0
 
-# LangChain family – compatible modern versions
+# LangChain family – aligned modern versions
 langchain==0.3.3
-langchain-core==0.3.8
+langchain-core==0.3.10          # ← bump to satisfy >=0.3.10
 langchain-community==0.3.2
 langchain-text-splitters==0.3.0
 langchain-groq==0.2.0
 langchain-chroma==0.1.4
 
-# Vector store & embeddings – use latest stable
+# Vector DB & embeddings
 chromadb==0.5.11
-sentence-transformers==3.1.1          # ← valid latest version (3.2.2 doesn't exist yet)
+sentence-transformers==3.1.1
 
-# PDF & data processing
+# PDF & data
 pdfplumber==0.11.4
 pymupdf==1.25.1
 pandas==2.2.2
