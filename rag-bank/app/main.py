@@ -276,7 +276,7 @@ async def health_check():
 async def get_templates():
     return {"templates": settings.allowed_templates}
 
-@app.post("/initialize")
+
 @app.post("/initialize")
 async def initialize_vectorstore(request: InitializeRequest):
     """Initialize the vector store with documents from rag-bank/data/raw"""
@@ -525,16 +525,16 @@ async def process_query(user_query: UserQuery, background_tasks: BackgroundTasks
         raise HTTPException(status_code=500, detail=f"Error processing query: {str(e)}")
 
 
-if __name__ == "__main__":
-    print("\nStarting Uvicorn...")
-    print("Recommended command: python -m main   (better for relative imports)")
-    print("Or: python main.py\n")
+# if __name__ == "__main__":
+#     print("\nStarting Uvicorn...")
+#     print("Recommended command: python -m main   (better for relative imports)")
+#     print("Or: python main.py\n")
     
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )
+#     uvicorn.run(
+#         app,
+#         host="0.0.0.0",
+#         port=8000,
+#         reload=True,
+#         log_level="info"
+#     )
 
