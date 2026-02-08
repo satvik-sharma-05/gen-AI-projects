@@ -6,6 +6,13 @@ from contextlib import asynccontextmanager
 # Fix import paths FIRST — before any other imports
 # ────────────────────────────────────────────────
 
+import os
+import sys
+from pathlib import Path
+
+# 🔥 FIX PYTHON PATH
+BASE_DIR = Path(__file__).resolve().parent  # rag-bank/app
+sys.path.insert(0, str(BASE_DIR))
 
 # ────────────────────────────────────────────────
 # Now safe to import everything else
