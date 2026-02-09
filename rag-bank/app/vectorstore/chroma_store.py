@@ -1,16 +1,21 @@
 import os
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain_core.documents import Document
+
 
 class ChromaVectorStore:
     def __init__(self, persist_directory: str):
         self.persist_directory = persist_directory
 
-        # LOCAL CPU embeddings (SAFE ON RENDER)
-        self.embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2",
-            model_kwargs={"device": "cpu"}
+        hf_api_key = os.environ.get("HF_API_KEY")
+        if not hf_api_key:
+            raise RuntimeError("HF_API_KEY not set")
+
+        # REMOTE embeddings (Render-safe)
+        self.embeddings = HuggingFaceInferenceAPIEmbeddings(
+            api_key=hf_api_key,
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
 
     def create_store(self, documents: list[Document]):
