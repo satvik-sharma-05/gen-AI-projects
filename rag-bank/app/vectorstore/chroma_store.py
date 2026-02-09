@@ -17,35 +17,37 @@ class ChromaVectorStore:
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
 
-    def create_store(self, documents: list[Document]):
+    def create_store(self, documents):
         """
-        Create Chroma vector store from LangChain Document objects.
-        Uses from_documents for safety and simplicity.
+        Create Chroma store using from_texts (more reliable with Inference API embeddings)
         """
-        if not documents:
-            raise ValueError("No documents provided to create store")
+        texts = []
+        metadatas = []
+        ids = []
 
-        # Optional: filter again here (though already done in main.py)
-        valid_docs = [
-            doc for doc in documents
-            if hasattr(doc, "page_content") and doc.page_content and doc.page_content.strip()
-        ]
+        for doc in documents:
+            if not doc.page_content or not doc.page_content.strip():
+                continue
+            texts.append(doc.page_content)
+            metadatas.append(doc.metadata or {})
+            ids.append(str(uuid4()))  # or use doc.metadata.get('id') if available
 
-        if not valid_docs:
-            raise ValueError("No valid documents after filtering")
+        if not texts:
+            raise ValueError("No valid texts to embed after filtering")
 
-        print(f"Creating Chroma store with {len(valid_docs)} documents...")
+        print(f"Creating Chroma store with {len(texts)} valid texts...")
 
         try:
-            return Chroma.from_documents(
-                documents=valid_docs,
+            return Chroma.from_texts(
+                texts=texts,
                 embedding=self.embeddings,
+                metadatas=metadatas,
+                ids=ids,
                 persist_directory=self.persist_directory,
-                collection_name="corep_regulatory_docs",  # explicit name
-                ids=[str(uuid4()) for _ in valid_docs]     # optional: custom IDs
+                collection_name="corep_regulatory_docs"
             )
         except Exception as e:
-            print(f"Chroma creation failed: {str(e)}")
+            print(f"Chroma from_texts failed: {str(e)}")
             raise
 
     def load_store(self):
