@@ -3,7 +3,7 @@ import sys
 import traceback
 from contextlib import asynccontextmanager
 from pathlib import Path
-
+from config import settings
 # ────────────────────────────────────────────────
 # Fix PYTHON PATH first
 # ────────────────────────────────────────────────
@@ -295,121 +295,218 @@ async def get_templates():
 
 @app.post("/initialize")
 async def initialize_vectorstore(request: InitializeRequest):
-    """Initialize the vector store with documents from rag-bank/data/raw"""
-    global vector_store_manager, retriever, is_initialized
-    
+    """
+    Initialize RAG system using in-memory document retrieval (NO vector DB).
+    LIVE-safe for Render.
+    """
+    global retriever, is_initialized
+
     try:
         from pathlib import Path
-        import shutil
-
-        # ---- HARD RESET VECTOR DB (REQUIRED) ----
-        if request.force_recreate:
-            if os.path.exists(settings.chroma_persist_dir):
-                print("🧨 Force recreate enabled → deleting existing Chroma DB")
-                shutil.rmtree(settings.chroma_persist_dir, ignore_errors=True)
 
         # ────────────────────────────────────────────────
-        # Path calculation (already correct)
+        # Resolve data path
         # ────────────────────────────────────────────────
         APP_DIR = Path(__file__).resolve().parent
         PROJECT_ROOT = APP_DIR.parent
         DATA_DIR = PROJECT_ROOT / "data" / "raw"
         data_dir = str(DATA_DIR)
-        
+
         print("=" * 60)
-        print("INITIALIZE ENDPOINT CALLED")
-        print(f"Current working dir:     {os.getcwd()}")
-        print(f"__file__ resolved parent: {APP_DIR}")
-        print(f"Looking for PDFs in:      {data_dir}")
+        print("INITIALIZE (IN-MEMORY RAG)")
+        print(f"Working dir: {os.getcwd()}")
+        print(f"PDF directory: {data_dir}")
         print("=" * 60)
-        
+
         if not os.path.exists(data_dir):
             return {
                 "status": "error",
-                "message": f"Data directory not found: {data_dir}",
-                "expected_location": "rag-bank/data/raw"
+                "message": f"Data directory not found: {data_dir}"
             }
-        
-        pdf_files = [f for f in os.listdir(data_dir) if f.lower().endswith(('.pdf', '.PDF'))]
-        
+
+        pdf_files = [f for f in os.listdir(data_dir) if f.lower().endswith(".pdf")]
         if not pdf_files:
             return {
                 "status": "error",
                 "message": "No PDF files found",
-                "path_checked": data_dir,
-                "found_files": os.listdir(data_dir)
+                "path_checked": data_dir
             }
-        
-        print(f"📁 Found {len(pdf_files)} PDF files:")
-        for f in pdf_files:
-            print(f"   - {f}")
-        
+
+        print(f"📁 Found {len(pdf_files)} PDF files")
+
+        # ────────────────────────────────────────────────
         # Load documents
+        # ────────────────────────────────────────────────
         loader = DocumentLoader(data_dir)
         documents = loader.load_pdfs()
-        
+
         if not documents:
             return {
                 "status": "error",
-                "message": "No pages loaded from PDFs",
-                "pdf_count": len(pdf_files)
+                "message": "PDFs loaded but no pages extracted"
             }
-        
-        print(f"📄 Loaded {len(documents)} document pages")
-        
+
+        print(f"📄 Loaded {len(documents)} pages")
+
+        # ────────────────────────────────────────────────
         # Chunk documents
+        # ────────────────────────────────────────────────
         chunker = DocumentChunker()
-        raw_chunks = chunker.chunk_documents(documents)
-        
-        # Filter invalid/empty chunks
-        chunked_docs = [
-            doc for doc in raw_chunks
-            if hasattr(doc, "page_content") and doc.page_content and doc.page_content.strip()
+        chunks = chunker.chunk_documents(documents)
+
+        chunks = [
+            c for c in chunks
+            if hasattr(c, "page_content") and c.page_content.strip()
         ]
-        
-        print(f"✂️ Created {len(raw_chunks)} raw chunks")
-        print(f"✅ Valid chunks after filtering: {len(chunked_docs)}")
-        
-        if not chunked_docs:
+
+        if not chunks:
             return {
                 "status": "error",
-                "message": "No valid chunks after filtering",
-                "raw_chunks": len(raw_chunks)
+                "message": "No valid chunks after processing"
             }
-        
+
+        print(f"✂️ Created {len(chunks)} valid chunks")
+
         # ────────────────────────────────────────────────
-        # Create vector store — FIXED VERSION
+        # In-memory retriever (NO Chroma)
         # ────────────────────────────────────────────────
-        if not vector_store_manager:
-            if ChromaVectorStore is None:
-                return {"status": "error", "message": "ChromaVectorStore unavailable"}
-            vector_store_manager = ChromaVectorStore(settings.chroma_persist_dir)
-        
-        print(f"🗄️ Creating vector store at: {settings.chroma_persist_dir}")
-        
-        # Use from_documents (recommended) — it handles embeddings internally
-        vectorstore = vector_store_manager.create_store(chunked_docs)
-        
-        retriever = RegulatoryRetriever(vectorstore)
+        retriever = RegulatoryRetriever(chunks)
         is_initialized = True
-        
+
+        print("✅ In-memory RAG initialized successfully")
+
         return {
             "status": "success",
-            "message": f"Vector store initialized with {len(chunked_docs)} chunks from {len(documents)} pages",
-            "documents_loaded": len(documents),
-            "chunks_created": len(chunked_docs),
-            "pdf_files_found": len(pdf_files),
-            "persist_directory": settings.chroma_persist_dir
+            "mode": "in-memory-rag",
+            "pdf_files": len(pdf_files),
+            "pages_loaded": len(documents),
+            "chunks_ready": len(chunks)
         }
-        
+
     except Exception as e:
-        print(f"❌ CRITICAL ERROR during initialization:")
+        print("❌ INITIALIZATION FAILED")
         traceback.print_exc()
         return {
             "status": "error",
-            "message": f"Initialization failed: {str(e)}",
-            "note": "Check Render logs for full traceback"
+            "message": str(e)
         }
+
+# async def initialize_vectorstore(request: InitializeRequest):
+#     """Initialize the vector store with documents from rag-bank/data/raw"""
+#     global vector_store_manager, retriever, is_initialized
+    
+#     try:
+#         from pathlib import Path
+#         import shutil
+
+#         # ---- HARD RESET VECTOR DB (REQUIRED) ----
+#         if request.force_recreate:
+#             if os.path.exists(settings.chroma_persist_dir):
+#                 print("🧨 Force recreate enabled → deleting existing Chroma DB")
+#                 shutil.rmtree(settings.chroma_persist_dir, ignore_errors=True)
+
+#         # ────────────────────────────────────────────────
+#         # Path calculation (already correct)
+#         # ────────────────────────────────────────────────
+#         APP_DIR = Path(__file__).resolve().parent
+#         PROJECT_ROOT = APP_DIR.parent
+#         DATA_DIR = PROJECT_ROOT / "data" / "raw"
+#         data_dir = str(DATA_DIR)
+        
+#         print("=" * 60)
+#         print("INITIALIZE ENDPOINT CALLED")
+#         print(f"Current working dir:     {os.getcwd()}")
+#         print(f"__file__ resolved parent: {APP_DIR}")
+#         print(f"Looking for PDFs in:      {data_dir}")
+#         print("=" * 60)
+        
+#         if not os.path.exists(data_dir):
+#             return {
+#                 "status": "error",
+#                 "message": f"Data directory not found: {data_dir}",
+#                 "expected_location": "rag-bank/data/raw"
+#             }
+        
+#         pdf_files = [f for f in os.listdir(data_dir) if f.lower().endswith(('.pdf', '.PDF'))]
+        
+#         if not pdf_files:
+#             return {
+#                 "status": "error",
+#                 "message": "No PDF files found",
+#                 "path_checked": data_dir,
+#                 "found_files": os.listdir(data_dir)
+#             }
+        
+#         print(f"📁 Found {len(pdf_files)} PDF files:")
+#         for f in pdf_files:
+#             print(f"   - {f}")
+        
+#         # Load documents
+#         loader = DocumentLoader(data_dir)
+#         documents = loader.load_pdfs()
+        
+#         if not documents:
+#             return {
+#                 "status": "error",
+#                 "message": "No pages loaded from PDFs",
+#                 "pdf_count": len(pdf_files)
+#             }
+        
+#         print(f"📄 Loaded {len(documents)} document pages")
+        
+#         # Chunk documents
+#         chunker = DocumentChunker()
+#         raw_chunks = chunker.chunk_documents(documents)
+        
+#         # Filter invalid/empty chunks
+#         chunked_docs = [
+#             doc for doc in raw_chunks
+#             if hasattr(doc, "page_content") and doc.page_content and doc.page_content.strip()
+#         ]
+        
+#         print(f"✂️ Created {len(raw_chunks)} raw chunks")
+#         print(f"✅ Valid chunks after filtering: {len(chunked_docs)}")
+        
+#         if not chunked_docs:
+#             return {
+#                 "status": "error",
+#                 "message": "No valid chunks after filtering",
+#                 "raw_chunks": len(raw_chunks)
+#             }
+        
+#         # ────────────────────────────────────────────────
+#         # Create vector store — FIXED VERSION
+#         # ────────────────────────────────────────────────
+#         if not vector_store_manager:
+#             if ChromaVectorStore is None:
+#                 return {"status": "error", "message": "ChromaVectorStore unavailable"}
+#             vector_store_manager = ChromaVectorStore(settings.chroma_persist_dir)
+        
+#         print(f"🗄️ Creating vector store at: {settings.chroma_persist_dir}")
+        
+#         # Use from_documents (recommended) — it handles embeddings internally
+#         vectorstore = vector_store_manager.create_store(chunked_docs)
+        
+#         retriever = RegulatoryRetriever(vectorstore)
+#         is_initialized = True
+        
+#         return {
+#             "status": "success",
+#             "message": f"Vector store initialized with {len(chunked_docs)} chunks from {len(documents)} pages",
+#             "documents_loaded": len(documents),
+#             "chunks_created": len(chunked_docs),
+#             "pdf_files_found": len(pdf_files),
+#             "persist_directory": settings.chroma_persist_dir
+#         }
+        
+#     except Exception as e:
+#         print(f"❌ CRITICAL ERROR during initialization:")
+#         traceback.print_exc()
+#         return {
+#             "status": "error",
+#             "message": f"Initialization failed: {str(e)}",
+#             "note": "Check Render logs for full traceback"
+#         }
     
 @app.get("/debug/imports")
 async def debug_imports():
