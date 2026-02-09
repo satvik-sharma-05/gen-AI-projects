@@ -3,7 +3,7 @@ import sys
 import traceback
 from contextlib import asynccontextmanager
 from pathlib import Path
-from config import settings
+
 # ────────────────────────────────────────────────
 # Fix PYTHON PATH first
 # ────────────────────────────────────────────────
@@ -155,30 +155,33 @@ async def lifespan(app: FastAPI):
     print("Step 1: Checking settings...")
     print(f"GROQ key present: {bool(settings.groq_api_key)}")
     
-    print("Step 2: Chroma init...")
-    if ChromaVectorStore:
-        try:
-            print("  Creating ChromaVectorStore...")
-            vector_store_manager = ChromaVectorStore(settings.chroma_persist_dir)
-            print("  Chroma instance created successfully")
+    print("Step 2: Retriever init...")
+    print("  In-memory retriever will be initialized via /initialize")
+
+    # print("Step 2: Chroma init...")
+    # if ChromaVectorStore:
+    #     try:
+    #         print("  Creating ChromaVectorStore...")
+    #         vector_store_manager = ChromaVectorStore(settings.chroma_persist_dir)
+    #         print("  Chroma instance created successfully")
             
-            if hasattr(vector_store_manager, 'store_exists') and vector_store_manager.store_exists():
-                print("  Existing store found → loading...")
-                if hasattr(vector_store_manager, 'load_store'):
-                    vectorstore = vector_store_manager.load_store()
-                    retriever = RegulatoryRetriever(vectorstore)
-                    is_initialized = True
-                    print("  ✓ Vector store loaded from disk")
-                else:
-                    print("  ℹ No load_store method found")
-            else:
-                print("  ℹ No existing store → call /initialize")
-        except Exception as e:
-            print(f"  Chroma CRASH: {str(e)}")
-            traceback.print_exc()
-            # Optional: raise if you want hard fail, or continue
-    else:
-        print("  ChromaVectorStore unavailable (import failed)")
+    #         if hasattr(vector_store_manager, 'store_exists') and vector_store_manager.store_exists():
+    #             print("  Existing store found → loading...")
+    #             if hasattr(vector_store_manager, 'load_store'):
+    #                 vectorstore = vector_store_manager.load_store()
+    #                 retriever = RegulatoryRetriever(vectorstore)
+    #                 is_initialized = True
+    #                 print("  ✓ Vector store loaded from disk")
+    #             else:
+    #                 print("  ℹ No load_store method found")
+    #         else:
+    #             print("  ℹ No existing store → call /initialize")
+    #     except Exception as e:
+    #         print(f"  Chroma CRASH: {str(e)}")
+    #         traceback.print_exc()
+    #         # Optional: raise if you want hard fail, or continue
+    # else:
+    #     print("  ChromaVectorStore unavailable (import failed)")
     
     print("Step 3: Generator init...")
     if settings.groq_api_key and COREPGenerator:
