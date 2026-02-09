@@ -10,9 +10,9 @@ class ChromaVectorStore:
 
         hf_api_key = os.environ.get("HF_API_KEY")
         if not hf_api_key:
-            raise RuntimeError("HF_API_KEY not set")
+            raise RuntimeError("HF_API_KEY is missing")
 
-        # REMOTE embeddings (Render-safe)
+        # 🔒 REMOTE embeddings (no torch, no models, no OOM)
         self.embeddings = HuggingFaceInferenceAPIEmbeddings(
             api_key=hf_api_key,
             model_name="sentence-transformers/all-MiniLM-L6-v2"
@@ -25,9 +25,9 @@ class ChromaVectorStore:
         ]
 
         if not valid_docs:
-            raise ValueError("No valid documents provided")
+            raise ValueError("No valid documents")
 
-        print(f"Creating Chroma store with {len(valid_docs)} documents...")
+        print(f"Creating Chroma store with {len(valid_docs)} documents")
 
         return Chroma.from_documents(
             documents=valid_docs,
