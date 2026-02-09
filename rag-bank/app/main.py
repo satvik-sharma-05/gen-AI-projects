@@ -300,7 +300,14 @@ async def initialize_vectorstore(request: InitializeRequest):
     
     try:
         from pathlib import Path
-        
+        import shutil
+
+        # ---- HARD RESET VECTOR DB (REQUIRED) ----
+        if request.force_recreate:
+            if os.path.exists(settings.chroma_persist_dir):
+                print("🧨 Force recreate enabled → deleting existing Chroma DB")
+                shutil.rmtree(settings.chroma_persist_dir, ignore_errors=True)
+
         # ────────────────────────────────────────────────
         # Path calculation (already correct)
         # ────────────────────────────────────────────────
